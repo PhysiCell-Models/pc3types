@@ -702,6 +702,9 @@ class SubstrateTab(object):
             print("Once output files are generated, click the slider.")   
             return
 
+        # set background color 
+        bgcolor = 0.0; # 1.0 for white 
+
         xlist = deque()
         ylist = deque()
         rlist = deque()
@@ -767,7 +770,20 @@ class SubstrateTab(object):
                 s = circle.attrib['fill']
                 # print("s=",s)
                 # print("type(s)=",type(s))
-                if (s[0:3] == "rgb"):  # if an rgb string, e.g. "rgb(175,175,80)" 
+                if( s[0:4] == "rgba" ):
+                    background = bgcolor * 255.0; # coudl also be 255.0 for white
+                    rgba_float =list(map(float,s[5:-1].split(",")))
+                    alpha = rgba_float[3];
+                    alpha *= 2.0; 
+                    if( alpha > 1.0 ):
+                        alpha = 1.0; 
+                    r = background * (1-alpha) + alpha*rgba_float[0];
+                    g = background * (1-alpha) + alpha*rgba_float[1];
+                    b = background * (1-alpha) + alpha*rgba_float[2];
+                    rgb = [ np.round(r), np.round(g), np.round(b) ];  
+                    rgb[:] = [x / 255. for x in rgb ]  
+                    # rgb = list(map(int, s[5:-1].split(",")))
+                elif (s[0:3] == "rgb" ):  # if an rgb string, e.g. "rgb(175,175,80)" 
                     rgb = list(map(int, s[4:-1].split(",")))  
                     rgb[:] = [x / 255. for x in rgb]
                 else:     # otherwise, must be a color name
@@ -831,6 +847,9 @@ class SubstrateTab(object):
 
         plt.xlim(self.xmin, self.xmax)
         plt.ylim(self.ymin, self.ymax)
+
+        ax = plt.gca()
+        ax.set_facecolor((bgcolor,bgcolor,bgcolor))
 
         #   plt.xlim(axes_min,axes_max)
         #   plt.ylim(axes_min,axes_max)
@@ -1023,14 +1042,14 @@ class SubstrateTab(object):
             if (self.cmap_fixed_toggle.value):
                 try:
                     # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
-                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
+                    substrate_plot = plt.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
                 except:
                     contour_ok = False
                     # print('got error on contourf 1.')
             else:    
                 try:
                     # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
-                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
+                    substrate_plot = plt.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
                 except:
                     contour_ok = False
                     # print('got error on contourf 2.')

@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">7200.0</max_time> 
+		<max_time units="min">3000.0</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -35,7 +35,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">30.0</interval>
+			<interval units="min">3.0</interval>
 			<enable>True</enable>
 		</SVG>
 		
@@ -451,7 +451,7 @@
 		 
 		<A_signal_A description="impact of signal A on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_A>
 		<A_signal_B description="impact of signal B on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_B>
-		<A_signal_C description="impact of signal C on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_C>
+		<A_signal_C description="impact of signal C on A secretion (promote, inhibit, or neutral" type="string">inhibit</A_signal_C>
 		<A_signal_R description="impact of resource on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_R>
 
 
@@ -475,7 +475,7 @@
 		<B_speed_R description="impact of resource on B motility (promote, inihbit, or neutral" type="string">neutral</B_speed_R>
 
 		 
-		<B_signal_A description="impact of signal A on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_A>
+		<B_signal_A description="impact of signal A on B secretion (promote, inhibit, or neutral" type="string">inhibit</B_signal_A>
 		<B_signal_B description="impact of signal B on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_B>
 		<B_signal_C description="impact of signal C on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_C>
 		<B_signal_R description="impact of resource on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_R>
@@ -501,7 +501,7 @@
 
 		 
 		<C_signal_A description="impact of signal A on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_A>
-		<C_signal_B description="impact of signal B on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_B>
+		<C_signal_B description="impact of signal B on C secretion (promote, inhibit, or neutral" type="string">inhibit</C_signal_B>
 		<C_signal_C description="impact of signal C on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_C>
 		<C_signal_R description="impact of resource on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_R>
 		
