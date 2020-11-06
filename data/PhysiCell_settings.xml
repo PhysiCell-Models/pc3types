@@ -619,6 +619,11 @@
 		<C_signal_C type="string" description="impact of signal C on C secretion (promote, inhibit, or neutral">neutral</C_signal_C>
 		<C_signal_R type="string" description="impact of resource on C secretion (promote, inhibit, or neutral">neutral</C_signal_R>
 		
+		<!--- danger zone -->
+		<dt_diffusion type="double" units="min" description="diffusion time step size">0.01</dt_diffusion>
+		<dt_mechanics type="double" units="min" description="mechanics time step size">0.1</dt_mechanics>
+		<dt_phenotype type="double" units="min" description="phenotype time step size">6</dt_phenotype>	
+
 	</user_parameters>
 	
 </PhysiCell_settings>

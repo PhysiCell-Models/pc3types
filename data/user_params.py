@@ -510,6 +510,30 @@ class UserTab(object):
           value='neutral',
           style=style, layout=widget_layout)
 
+        param_name66 = Button(description='dt_diffusion', disabled=True, layout=name_button_layout)
+        param_name66.style.button_color = 'tan'
+
+        self.dt_diffusion = FloatText(
+          value=0.01,
+          step=0.001,
+          style=style, layout=widget_layout)
+
+        param_name67 = Button(description='dt_mechanics', disabled=True, layout=name_button_layout)
+        param_name67.style.button_color = 'lightgreen'
+
+        self.dt_mechanics = FloatText(
+          value=0.1,
+          step=0.01,
+          style=style, layout=widget_layout)
+
+        param_name68 = Button(description='dt_phenotype', disabled=True, layout=name_button_layout)
+        param_name68.style.button_color = 'tan'
+
+        self.dt_phenotype = FloatText(
+          value=6,
+          step=0.1,
+          style=style, layout=widget_layout)
+
         units_button1 = Button(description='', disabled=True, layout=units_button_layout) 
         units_button1.style.button_color = 'lightgreen'
         units_button2 = Button(description='', disabled=True, layout=units_button_layout) 
@@ -652,6 +676,12 @@ class UserTab(object):
         units_button70.style.button_color = 'tan'
         units_button71 = Button(description='', disabled=True, layout=units_button_layout) 
         units_button71.style.button_color = 'lightgreen'
+        units_button72 = Button(description='min', disabled=True, layout=units_button_layout) 
+        units_button72.style.button_color = 'tan'
+        units_button73 = Button(description='min', disabled=True, layout=units_button_layout) 
+        units_button73.style.button_color = 'lightgreen'
+        units_button74 = Button(description='min', disabled=True, layout=units_button_layout) 
+        units_button74.style.button_color = 'tan'
 
         desc_button1 = Button(description='' , tooltip='', disabled=True, layout=desc_button_layout) 
         desc_button1.style.button_color = 'lightgreen'
@@ -783,6 +813,12 @@ class UserTab(object):
         desc_button64.style.button_color = 'tan'
         desc_button65 = Button(description='impact of resource on C secretion (promote, inhibit, or neutral' , tooltip='impact of resource on C secretion (promote, inhibit, or neutral', disabled=True, layout=desc_button_layout) 
         desc_button65.style.button_color = 'lightgreen'
+        desc_button66 = Button(description='diffusion time step size' , tooltip='diffusion time step size', disabled=True, layout=desc_button_layout) 
+        desc_button66.style.button_color = 'tan'
+        desc_button67 = Button(description='mechanics time step size' , tooltip='mechanics time step size', disabled=True, layout=desc_button_layout) 
+        desc_button67.style.button_color = 'lightgreen'
+        desc_button68 = Button(description='phenotype time step size' , tooltip='phenotype time step size', disabled=True, layout=desc_button_layout) 
+        desc_button68.style.button_color = 'tan'
 
         row1 = [param_name1, self.random_seed, units_button1, desc_button1] 
         row2 = [param_name2, self.number_of_A, units_button3, desc_button2] 
@@ -849,6 +885,9 @@ class UserTab(object):
         row63 = [param_name63, self.C_signal_B, units_button69, desc_button63] 
         row64 = [param_name64, self.C_signal_C, units_button70, desc_button64] 
         row65 = [param_name65, self.C_signal_R, units_button71, desc_button65] 
+        row66 = [param_name66, self.dt_diffusion, units_button72, desc_button66] 
+        row67 = [param_name67, self.dt_mechanics, units_button73, desc_button67] 
+        row68 = [param_name68, self.dt_phenotype, units_button74, desc_button68] 
 
         box_layout = Layout(display='flex', flex_flow='row', align_items='stretch', width='100%')
         box1 = Box(children=row1, layout=box_layout)
@@ -916,6 +955,9 @@ class UserTab(object):
         box63 = Box(children=row63, layout=box_layout)
         box64 = Box(children=row64, layout=box_layout)
         box65 = Box(children=row65, layout=box_layout)
+        box66 = Box(children=row66, layout=box_layout)
+        box67 = Box(children=row67, layout=box_layout)
+        box68 = Box(children=row68, layout=box_layout)
 
         self.tab = VBox([
           box1,
@@ -989,6 +1031,9 @@ class UserTab(object):
           box63,
           box64,
           box65,
+          box66,
+          box67,
+          box68,
         ])
 
     # Populate the GUI widgets with values from the XML
@@ -1065,6 +1110,9 @@ class UserTab(object):
         self.C_signal_B.value = (uep.find('.//C_signal_B').text)
         self.C_signal_C.value = (uep.find('.//C_signal_C').text)
         self.C_signal_R.value = (uep.find('.//C_signal_R').text)
+        self.dt_diffusion.value = float(uep.find('.//dt_diffusion').text)
+        self.dt_mechanics.value = float(uep.find('.//dt_mechanics').text)
+        self.dt_phenotype.value = float(uep.find('.//dt_phenotype').text)
 
 
     # Read values from the GUI widgets to enable editing XML
@@ -1141,3 +1189,6 @@ class UserTab(object):
         uep.find('.//C_signal_B').text = str(self.C_signal_B.value)
         uep.find('.//C_signal_C').text = str(self.C_signal_C.value)
         uep.find('.//C_signal_R').text = str(self.C_signal_R.value)
+        uep.find('.//dt_diffusion').text = str(self.dt_diffusion.value)
+        uep.find('.//dt_mechanics').text = str(self.dt_mechanics.value)
+        uep.find('.//dt_phenotype').text = str(self.dt_phenotype.value)
