@@ -382,7 +382,11 @@ class SubstrateTab(object):
 
             self.download_svg_button = Download('svg.zip', style='warning', icon='cloud-download', 
                                             tooltip='You need to allow pop-ups in your browser', cb=self.download_svg_cb)
-            download_row = HBox([self.download_button.w, self.download_svg_button.w, Label("Download all cell plots (browser must allow pop-ups).")])
+
+            self.download_settings_button = Download('config.zip', style='warning', icon='cloud-download',
+                                            tooltip='Download XML configuration (settings) file.', cb=self.download_settings_cb )
+
+            download_row = HBox([self.download_button.w, self.download_svg_button.w, self.download_settings_button.w, Label("Download all cell plots (browser must allow pop-ups).")])
 
             # box_layout = Layout(border='0px solid')
             controls_box = VBox([row1, row2])  # ,width='50%', layout=box_layout)
@@ -546,6 +550,12 @@ class SubstrateTab(object):
         file_str = os.path.join(self.output_dir, '*.svg')
         # print('zip up all ',file_str)
         with zipfile.ZipFile('svg.zip', 'w') as myzip:
+            for f in glob.glob(file_str):
+                myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename path in the archive
+
+    def download_settings_cb(self):
+        file_str = os.path.join(self.output_dir, 'config.zip')
+        with zipfile.ZipFile('config.zip','w') as myzip:
             for f in glob.glob(file_str):
                 myzip.write(f, os.path.basename(f))   # 2nd arg avoids full filename path in the archive
 
@@ -1041,15 +1051,15 @@ class SubstrateTab(object):
             contour_ok = True
             if (self.cmap_fixed_toggle.value):
                 try:
-                    # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
-                    substrate_plot = main_ax.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
+                    #substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
+                    substrate_plot = plt.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
                 except:
                     contour_ok = False
                     # print('got error on contourf 1.')
             else:    
                 try:
-                    # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
-                    substrate_plot = main_ax.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
+                    #substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
+                    substrate_plot = plt.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
                 except:
                     contour_ok = False
                     # print('got error on contourf 2.')
