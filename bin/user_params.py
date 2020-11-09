@@ -510,6 +510,8 @@ class UserTab(object):
           value='neutral',
           style=style, layout=widget_layout)
 
+        div_row7 = Button(description='---Danger Zone (Advanced Settings)---', disabled=True, layout=divider_button_layout)
+
         param_name66 = Button(description='dt_diffusion', disabled=True, layout=name_button_layout)
         param_name66.style.button_color = 'tan'
 
@@ -676,12 +678,14 @@ class UserTab(object):
         units_button70.style.button_color = 'tan'
         units_button71 = Button(description='', disabled=True, layout=units_button_layout) 
         units_button71.style.button_color = 'lightgreen'
-        units_button72 = Button(description='min', disabled=True, layout=units_button_layout) 
-        units_button72.style.button_color = 'tan'
+        units_button72 = Button(description='', disabled=True, layout=units_button_layout) 
+        units_button72.style.button_color = 'lightgreen'
         units_button73 = Button(description='min', disabled=True, layout=units_button_layout) 
-        units_button73.style.button_color = 'lightgreen'
+        units_button73.style.button_color = 'tan'
         units_button74 = Button(description='min', disabled=True, layout=units_button_layout) 
-        units_button74.style.button_color = 'tan'
+        units_button74.style.button_color = 'lightgreen'
+        units_button75 = Button(description='min', disabled=True, layout=units_button_layout) 
+        units_button75.style.button_color = 'tan'
 
         desc_button1 = Button(description='' , tooltip='', disabled=True, layout=desc_button_layout) 
         desc_button1.style.button_color = 'lightgreen'
@@ -885,9 +889,9 @@ class UserTab(object):
         row63 = [param_name63, self.C_signal_B, units_button69, desc_button63] 
         row64 = [param_name64, self.C_signal_C, units_button70, desc_button64] 
         row65 = [param_name65, self.C_signal_R, units_button71, desc_button65] 
-        row66 = [param_name66, self.dt_diffusion, units_button72, desc_button66] 
-        row67 = [param_name67, self.dt_mechanics, units_button73, desc_button67] 
-        row68 = [param_name68, self.dt_phenotype, units_button74, desc_button68] 
+        row66 = [param_name66, self.dt_diffusion, units_button73, desc_button66] 
+        row67 = [param_name67, self.dt_mechanics, units_button74, desc_button67] 
+        row68 = [param_name68, self.dt_phenotype, units_button75, desc_button68] 
 
         box_layout = Layout(display='flex', flex_flow='row', align_items='stretch', width='100%')
         box1 = Box(children=row1, layout=box_layout)
@@ -1031,6 +1035,7 @@ class UserTab(object):
           box63,
           box64,
           box65,
+          div_row7,
           box66,
           box67,
           box68,

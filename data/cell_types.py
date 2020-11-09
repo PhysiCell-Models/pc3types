@@ -687,7 +687,7 @@ class CellTypesTab(object):
         death_model1.style.button_color = '#ffde6b'
         name_btn = Button(description='death rate', disabled=True, layout=name_button_layout)
         name_btn.style.button_color = 'tan'
-        self.float62 = FloatText(value='5.31667e-05', step='1e-05', style=style, layout=widget_layout)
+        self.float62 = FloatText(value='0.00001', step='1e-06', style=style, layout=widget_layout)
         units_btn = Button(description='1/min', disabled=True, layout=name_button_layout)
         units_btn.style.button_color = 'tan'
         row = [name_btn, self.float62, units_btn, ]
@@ -841,7 +841,7 @@ class CellTypesTab(object):
         death_model1.style.button_color = '#ffde6b'
         name_btn = Button(description='death rate', disabled=True, layout=name_button_layout)
         name_btn.style.button_color = 'lightgreen'
-        self.float74 = FloatText(value='5.31667e-05', step='1e-05', style=style, layout=widget_layout)
+        self.float74 = FloatText(value='0.00001', step='1e-06', style=style, layout=widget_layout)
         units_btn = Button(description='1/min', disabled=True, layout=name_button_layout)
         units_btn.style.button_color = 'lightgreen'
         row = [name_btn, self.float74, units_btn, ]
