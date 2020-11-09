@@ -412,7 +412,7 @@
 				</cycle>
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<death_rate units="1/min">5.31667e-05</death_rate>
+						<death_rate units="1/min">0.00001</death_rate>
 					</model> 
 
 					<model code="101" name="necrosis">
@@ -467,7 +467,7 @@
 				</cycle>
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<death_rate units="1/min">5.31667e-05</death_rate>
+						<death_rate units="1/min">0.00001</death_rate>
 					</model> 
 
 					<model code="101" name="necrosis">
@@ -620,6 +620,7 @@
 		<C_signal_R type="string" description="impact of resource on C secretion (promote, inhibit, or neutral">neutral</C_signal_R>
 		
 		<!--- danger zone -->
+		<div_danger type="divider" description="---Danger Zone (Advanced Settings)---"/>
 		<dt_diffusion type="double" units="min" description="diffusion time step size">0.01</dt_diffusion>
 		<dt_mechanics type="double" units="min" description="mechanics time step size">0.1</dt_mechanics>
 		<dt_phenotype type="double" units="min" description="phenotype time step size">6</dt_phenotype>	
