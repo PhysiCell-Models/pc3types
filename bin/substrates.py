@@ -718,7 +718,8 @@ class SubstrateTab(object):
         xlist = deque()
         ylist = deque()
         rlist = deque()
-        rgb_list = deque()
+        # rgb_list = deque() # Paul Nov 2020 
+        rgba_list = deque()
 
         #  print('\n---- ' + fname + ':')
 #        tree = ET.parse(fname)
@@ -792,14 +793,19 @@ class SubstrateTab(object):
                     b = background * (1-alpha) + alpha*rgba_float[2];
                     rgb = [ np.round(r), np.round(g), np.round(b) ];  
                     rgb[:] = [x / 255. for x in rgb ]  
+                    rgba = [rgba_float[0]/255.0, rgba_float[1]/255.0, rgba_float[2]/255.0,alpha];
+                    # rgba[0:3] = rgb; 
                     # rgb = list(map(int, s[5:-1].split(",")))
                 elif (s[0:3] == "rgb" ):  # if an rgb string, e.g. "rgb(175,175,80)" 
                     rgb = list(map(int, s[4:-1].split(",")))  
                     rgb[:] = [x / 255. for x in rgb]
+                    rgba = [1,1,1,1.0];
+                    rgba[0:3] = rgb; 
                 else:     # otherwise, must be a color name
                     rgb_tuple = mplc.to_rgb(mplc.cnames[s])  # a tuple
                     rgb = [x for x in rgb_tuple]
-
+                    rgba = [1,1,1,1];
+                    rgba[0:3] = rgb; 
                 # test for bogus x,y locations (rwh TODO: use max of domain?)
                 too_large_val = 10000.
                 if (np.fabs(xval) > too_large_val):
@@ -818,7 +824,9 @@ class SubstrateTab(object):
                 xlist.append(xval)
                 ylist.append(yval)
                 rlist.append(rval)
-                rgb_list.append(rgb)
+                # rgb_list.append(rgb)
+
+                rgba_list.append(rgba)
 
                 # For .svg files with cells that *have* a nucleus, there will be a 2nd
                 if (not self.show_nucleus):
@@ -837,7 +845,9 @@ class SubstrateTab(object):
         xvals = np.array(xlist)
         yvals = np.array(ylist)
         rvals = np.array(rlist)
-        rgbs = np.array(rgb_list)
+        #rgbs = np.array(rgb_list)
+
+        rgbas = np.array(rgba_list)
         # print("xvals[0:5]=",xvals[0:5])
         # print("rvals[0:5]=",rvals[0:5])
         # print("rvals.min, max=",rvals.min(),rvals.max())
@@ -891,14 +901,14 @@ class SubstrateTab(object):
         if (self.show_edge):
             try:
                 # plt.scatter(xvals,yvals, s=markers_size, c=rgbs, edgecolor='black', linewidth=0.5)
-                self.circles(xvals,yvals, s=rvals, color=rgbs, edgecolor='black', linewidth=0.5)
+                self.circles(xvals,yvals, s=rvals, color=rgbas, edgecolor='black', linewidth=0.5 )
                 # cell_circles = self.circles(xvals,yvals, s=rvals, color=rgbs, edgecolor='black', linewidth=0.5)
                 # plt.sci(cell_circles)
             except (ValueError):
                 pass
         else:
             # plt.scatter(xvals,yvals, s=markers_size, c=rgbs)
-            self.circles(xvals,yvals, s=rvals, color=rgbs)
+            self.circles(xvals,yvals, s=rvals, color=rgbas  )
 
         # if (self.show_tracks):
         #     for key in self.trackd.keys():
@@ -1052,14 +1062,14 @@ class SubstrateTab(object):
             if (self.cmap_fixed_toggle.value):
                 try:
                     #substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
-                    substrate_plot = plt.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
+                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
                 except:
                     contour_ok = False
                     # print('got error on contourf 1.')
             else:    
                 try:
                     #substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
-                    substrate_plot = plt.contour(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
+                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
                 except:
                     contour_ok = False
                     # print('got error on contourf 2.')
