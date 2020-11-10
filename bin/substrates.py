@@ -77,6 +77,11 @@ class SubstrateTab(object):
         self.show_nucleus = False
         self.show_edge = True
 
+        # Paul's additions in Nov 2020
+        self.bgcolor = [1,1,1]
+        self.darkoption = False; 
+        self.enable_alpha = True; 
+
         # initial value
         self.field_index = 4
         # self.field_index = self.mcds_field.value + 4
@@ -713,13 +718,12 @@ class SubstrateTab(object):
             return
 
         # set background color 
-        bgcolor = 0.0; # 1.0 for white 
+        bgcolor = self.bgcolor;  # 1.0 for white 
 
         xlist = deque()
         ylist = deque()
         rlist = deque()
-        # rgb_list = deque() # Paul Nov 2020 
-        rgba_list = deque()
+        rgba_list = deque() # Paul Nov 2020 
 
         #  print('\n---- ' + fname + ':')
 #        tree = ET.parse(fname)
@@ -782,30 +786,33 @@ class SubstrateTab(object):
                 # print("s=",s)
                 # print("type(s)=",type(s))
                 if( s[0:4] == "rgba" ):
-                    background = bgcolor * 255.0; # coudl also be 255.0 for white
+                    background = bgcolor[0] * 255.0; # coudl also be 255.0 for white
                     rgba_float =list(map(float,s[5:-1].split(",")))
                     alpha = rgba_float[3];
                     alpha *= 2.0; 
-                    if( alpha > 1.0 ):
+                    if( alpha > 1.0 or self.enable_alpha == False ):
                         alpha = 1.0; 
-                    r = background * (1-alpha) + alpha*rgba_float[0];
-                    g = background * (1-alpha) + alpha*rgba_float[1];
-                    b = background * (1-alpha) + alpha*rgba_float[2];
-                    rgb = [ np.round(r), np.round(g), np.round(b) ];  
-                    rgb[:] = [x / 255. for x in rgb ]  
-                    rgba = [rgba_float[0]/255.0, rgba_float[1]/255.0, rgba_float[2]/255.0,alpha];
+                        r = rgba_float[0];
+                        g = rgba_float[1];
+                        b = rgba_float[2];
+                    else:
+                        r = background * (1-alpha) + alpha*rgba_float[0];
+                        g = background * (1-alpha) + alpha*rgba_float[1];
+                        b = background * (1-alpha) + alpha*rgba_float[2];
+                    rgba = [1,1,1,alpha];
+                    rgba[0:3] = [ np.round(r), np.round(g), np.round(b) ];  
+                    rgba[0:3] = [x / 255. for x in rgba[0:3] ]  
+                    # rgba = [rgba_float[0]/255.0, rgba_float[1]/255.0, rgba_float[2]/255.0,alpha];
                     # rgba[0:3] = rgb; 
                     # rgb = list(map(int, s[5:-1].split(",")))
                 elif (s[0:3] == "rgb" ):  # if an rgb string, e.g. "rgb(175,175,80)" 
-                    rgb = list(map(int, s[4:-1].split(",")))  
-                    rgb[:] = [x / 255. for x in rgb]
                     rgba = [1,1,1,1.0];
-                    rgba[0:3] = rgb; 
+                    rgba[0:3] = list(map(int, s[4:-1].split(",")))  
+                    rgba[0:3] = [x / 255. for x in rgba[0:3] ]
                 else:     # otherwise, must be a color name
                     rgb_tuple = mplc.to_rgb(mplc.cnames[s])  # a tuple
-                    rgb = [x for x in rgb_tuple]
-                    rgba = [1,1,1,1];
-                    rgba[0:3] = rgb; 
+                    rgba = [1,1,1,1.0]
+                    rgba[0:3] = [x for x in rgb_tuple]
                 # test for bogus x,y locations (rwh TODO: use max of domain?)
                 too_large_val = 10000.
                 if (np.fabs(xval) > too_large_val):
@@ -869,7 +876,7 @@ class SubstrateTab(object):
         plt.ylim(self.ymin, self.ymax)
 
         ax = plt.gca()
-        ax.set_facecolor((bgcolor,bgcolor,bgcolor))
+        ax.set_facecolor(bgcolor)
 
         #   plt.xlim(axes_min,axes_max)
         #   plt.ylim(axes_min,axes_max)

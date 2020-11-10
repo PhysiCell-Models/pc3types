@@ -13,7 +13,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440.0</max_time> 
+		<max_time units="min">7200.0</max_time> 
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -30,12 +30,12 @@
 		<folder>.</folder>  
 
 		<full_data>
-			<interval units="min">30.0</interval>
+			<interval units="min">60.0</interval>
 			<enable>True</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">1.0</interval>
+			<interval units="min">30.0</interval>
 			<enable>True</enable>
 		</SVG>
 		
@@ -238,16 +238,16 @@
 			<phenotype>
 				<cycle code="5" name="live">
 					<phase_transition_rates units="1/min"> 
-						<rate end_index="0" fixed_duration="false" start_index="0">0.0</rate>
+						<rate end_index="0" fixed_duration="false" start_index="0">0.00072</rate>
 					</phase_transition_rates>					
 				</cycle>
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<death_rate units="1/min">0.0</death_rate>
+						<death_rate units="1/min">1e-05</death_rate>
 					</model> 
 	
 					<model code="101" name="necrosis">
-						<death_rate units="1/min">0.0</death_rate>
+						<death_rate units="1/min">0.01</death_rate>
 					</model> 
 				</death>					
 				<volume>  
@@ -293,16 +293,16 @@
 			<phenotype>
 				<cycle code="5" name="live">
 					<phase_transition_rates units="1/min"> 
-						<rate end_index="0" fixed_duration="false" start_index="0">0.0</rate>
+						<rate end_index="0" fixed_duration="false" start_index="0">0.00072</rate>
 					</phase_transition_rates>					
 				</cycle>
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<death_rate units="1/min">0.0</death_rate>
+						<death_rate units="1/min">1e-05</death_rate>
 					</model> 
 
 					<model code="101" name="necrosis">
-						<death_rate units="1/min">0.0</death_rate>
+						<death_rate units="1/min">0.01</death_rate>
 					</model> 
 				</death>					
 				<volume>  
@@ -348,16 +348,16 @@
 			<phenotype>
 				<cycle code="5" name="live">
 					<phase_transition_rates units="1/min"> 
-						<rate end_index="0" fixed_duration="false" start_index="0">0.0</rate>
+						<rate end_index="0" fixed_duration="false" start_index="0">0.00072</rate>
 					</phase_transition_rates>					
 				</cycle>
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<death_rate units="1/min">0.0</death_rate>
+						<death_rate units="1/min">1e-05</death_rate>
 					</model> 
 
 					<model code="101" name="necrosis">
-						<death_rate units="1/min">0.0</death_rate>
+						<death_rate units="1/min">0.01</death_rate>
 					</model> 
 				</death>					
 				<volume>  
@@ -409,10 +409,10 @@
 		
 		<div_initialization description="---Initialization settings---" type="divider" />
 		
-		<number_of_A description="initial number of A" type="int" units="none">500</number_of_A>  
-		<number_of_B description="initial number of B" type="int" units="none">500</number_of_B>
-		<number_of_C description="initial number of C" type="int" units="none">500</number_of_C>
-		<max_distance_from_origin description="max initial distance of cells from (0,0,0)" type="double" units="micron">450.0</max_distance_from_origin>
+		<number_of_A description="initial number of A" type="int" units="none">25</number_of_A>  
+		<number_of_B description="initial number of B" type="int" units="none">25</number_of_B>
+		<number_of_C description="initial number of C" type="int" units="none">25</number_of_C>
+		<max_distance_from_origin description="max initial distance of cells from (0,0,0)" type="double" units="micron">150.0</max_distance_from_origin>
 		
 		<div_coloring description="---Coloring settings---" type="divider" />
 
@@ -451,7 +451,7 @@
 		 
 		<A_signal_A description="impact of signal A on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_A>
 		<A_signal_B description="impact of signal B on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_B>
-		<A_signal_C description="impact of signal C on A secretion (promote, inhibit, or neutral" type="string">inhibit</A_signal_C>
+		<A_signal_C description="impact of signal C on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_C>
 		<A_signal_R description="impact of resource on A secretion (promote, inhibit, or neutral" type="string">neutral</A_signal_R>
 
 
@@ -475,7 +475,7 @@
 		<B_speed_R description="impact of resource on B motility (promote, inihbit, or neutral" type="string">neutral</B_speed_R>
 
 		 
-		<B_signal_A description="impact of signal A on B secretion (promote, inhibit, or neutral" type="string">inhibit</B_signal_A>
+		<B_signal_A description="impact of signal A on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_A>
 		<B_signal_B description="impact of signal B on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_B>
 		<B_signal_C description="impact of signal C on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_C>
 		<B_signal_R description="impact of resource on B secretion (promote, inhibit, or neutral" type="string">neutral</B_signal_R>
@@ -501,7 +501,7 @@
 
 		 
 		<C_signal_A description="impact of signal A on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_A>
-		<C_signal_B description="impact of signal B on C secretion (promote, inhibit, or neutral" type="string">inhibit</C_signal_B>
+		<C_signal_B description="impact of signal B on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_B>
 		<C_signal_C description="impact of signal C on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_C>
 		<C_signal_R description="impact of resource on C secretion (promote, inhibit, or neutral" type="string">neutral</C_signal_R>
 		
@@ -509,7 +509,7 @@
 		<div_danger description="---Danger Zone (Advanced Settings)---" type="divider" />
 		<dt_diffusion description="diffusion time step size" type="double" units="min">0.01</dt_diffusion>
 		<dt_mechanics description="mechanics time step size" type="double" units="min">0.1</dt_mechanics>
-		<dt_phenotype description="phenotype time step size" type="double" units="min">1.0</dt_phenotype>	
+		<dt_phenotype description="phenotype time step size" type="double" units="min">6.0</dt_phenotype>	
 
 	</user_parameters>
 	
