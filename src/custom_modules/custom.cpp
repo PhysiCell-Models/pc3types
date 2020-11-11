@@ -319,11 +319,13 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 	char color [32]; 
 	double max_fluorescence = 1; // 
 
+	double value = 0.0; 
+
 	// color live A
 		
 	if( pCell->type == A_type )
 	{
-		double value = pCell->phenotype.secretion.secretion_rates[nA] 
+		value = pCell->phenotype.secretion.secretion_rates[nA] 
 			/ ( 0.001 + pCD_A->phenotype.secretion.secretion_rates[nA] ) ;
 			
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
@@ -336,7 +338,7 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 
 	if( pCell->type == B_type )
 	{
-		double value = pCell->phenotype.secretion.secretion_rates[nB] 
+		value = pCell->phenotype.secretion.secretion_rates[nB] 
 			/ ( 0.001 + pCD_B->phenotype.secretion.secretion_rates[nB] ); 
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
@@ -348,13 +350,19 @@ std::vector<std::string> pseudo_fluorescence( Cell* pCell )
 
 	if( pCell->type == C_type )
 	{
-		double value = pCell->phenotype.secretion.secretion_rates[nC] 
+		value = pCell->phenotype.secretion.secretion_rates[nC] 
 			/ ( 0.001 + pCD_C->phenotype.secretion.secretion_rates[nC] ); 
 		value *= (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence;  
 		if( pCell->phenotype.death.dead == true )
 		{ value = (1.0-pCell->phenotype.volume.fluid_fraction) * max_fluorescence; }
 		sprintf( color, "rgba(0,255,255,%f)", value ); 		
 	}
+
+	// Necrotic - black
+	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
+		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
+	{ sprintf(color,"rgba(0,0,0,%f)" , value ); } 
 
 	output = { color, "none", color , "none" }; 
 	return output; 

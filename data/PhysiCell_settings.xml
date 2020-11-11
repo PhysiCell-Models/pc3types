@@ -534,7 +534,7 @@
 		<B_color type="string" description="color for B cells">green</B_color>
 		<C_color type="string" description="color for C cells">cyan</C_color>
 		
-		<standard_plots type="bool" description="Enable additional standard plots?">true</standard_plots>
+		<standard_plots type="bool" description="Enable additional standard plots?">false</standard_plots>
 	
 		<div_signaling type="divider" description="---Overall signaling settings---"/>
 		<hill_power type="double" units="none" description="Hill power for signal responses">5</hill_power> <!-- 2 --> 

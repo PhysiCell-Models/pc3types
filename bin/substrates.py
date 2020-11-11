@@ -79,7 +79,7 @@ class SubstrateTab(object):
 
         # Paul's additions in Nov 2020
         self.bgcolor = [1,1,1]
-        self.darkoption = False; 
+        self.dark_mode = True; 
         self.enable_alpha = True; 
 
         # initial value
@@ -152,8 +152,9 @@ class SubstrateTab(object):
         self.field_cmap.observe(self.mcds_field_cb)
 
         self.cmap_fixed_toggle = Checkbox(
-            description='Fix',
+            description='Fixed substrate range?',
             disabled=False,
+            value=True,
 #           layout=Layout(width=constWidth2),
         )
         self.cmap_fixed_toggle.observe(self.mcds_field_cb)
@@ -288,6 +289,23 @@ class SubstrateTab(object):
 
         self.cell_edges_toggle.observe(cell_edges_toggle_cb)
 
+        self.cell_alpha_toggle = Checkbox(
+            description='transparency',
+            disabled=False,
+            value=self.enable_alpha, 
+        )
+        def cell_alpha_toggle_cb(b):
+            #print( 'yay ')
+            if( self.cell_alpha_toggle.value):
+                self.enable_alpha = True
+                #print( 'enable') 
+            else:
+                self.enable_alpha = False 
+                #print( 'disable')
+            self.i_plot.update()
+
+        self.cell_alpha_toggle.observe(cell_alpha_toggle_cb)
+
         self.cells_toggle = Checkbox(
             description='Cells',
             disabled=False,
@@ -305,6 +323,28 @@ class SubstrateTab(object):
                 self.cell_nucleus_toggle.disabled = True
 
         self.cells_toggle.observe(cells_toggle_cb)
+
+
+        self.dark_mode_toggle = Checkbox(
+            description='dark mode',
+            disabled=False,
+            value=self.dark_mode, 
+        )
+        def dark_mode_toggle_cb(b):
+            #print( 'yay ')
+            if( self.dark_mode_toggle.value):
+                self.dark_mode = True
+                self.bgcolor = [0,0,0,1]
+                #print( 'enable') 
+            else:
+                self.dark_mode = False 
+                self.bgcolor = [1,1,1,1]
+                #print( 'disable')
+            self.i_plot.update()
+
+        self.dark_mode_toggle.observe(dark_mode_toggle_cb)
+
+
 
         #---------------------
         self.substrates_toggle = Checkbox(
@@ -357,7 +397,8 @@ class SubstrateTab(object):
                             align_items='stretch',
                             flex_direction='row',
                             display='flex')) 
-        row1b = Box( [self.cells_toggle, self.cell_nucleus_toggle, self.cell_edges_toggle], layout=Layout(border='1px solid black',
+        # row1b = Box( [self.cells_toggle, self.cell_nucleus_toggle, self.cell_edges_toggle, self.cell_alpha_toggle], layout=Layout(border='1px solid black',
+        row1b = Box( [self.cells_toggle, self.cell_edges_toggle, self.cell_alpha_toggle], layout=Layout(border='1px solid black',
                             width='50%',
                             height='',
                             align_items='stretch',
@@ -372,7 +413,7 @@ class SubstrateTab(object):
                             flex_direction='row',
                             display='flex'))
         # row2b = Box( [self.substrates_toggle, self.grid_toggle], layout=Layout(border='1px solid black',
-        row2b = Box( [self.substrates_toggle, ], layout=Layout(border='1px solid black',
+        row2b = Box( [self.substrates_toggle, self.dark_mode_toggle ], layout=Layout(border='1px solid black',
                             width='50%',
                             height='',
                             align_items='stretch',
@@ -788,17 +829,24 @@ class SubstrateTab(object):
                 if( s[0:4] == "rgba" ):
                     background = bgcolor[0] * 255.0; # coudl also be 255.0 for white
                     rgba_float =list(map(float,s[5:-1].split(",")))
+                    r = rgba_float[0];
+                    g = rgba_float[1];
+                    b = rgba_float[2];                    
                     alpha = rgba_float[3];
-                    alpha *= 2.0; 
-                    if( alpha > 1.0 or self.enable_alpha == False ):
-                        alpha = 1.0; 
-                        r = rgba_float[0];
-                        g = rgba_float[1];
-                        b = rgba_float[2];
-                    else:
-                        r = background * (1-alpha) + alpha*rgba_float[0];
-                        g = background * (1-alpha) + alpha*rgba_float[1];
-                        b = background * (1-alpha) + alpha*rgba_float[2];
+                    alpha *= 2.0; # cell_alpha_toggle
+                    if( alpha > 1.0 ):
+                    # if( alpha > 1.0 or self.cell_alpha_toggle.value == False ):
+                        alpha = 1.0;
+                    if( self.cell_alpha_toggle.value == False ):
+                        alpha = 1.0;  
+#                        r = rgba_float[0];
+#                        g = rgba_float[1];
+#                        b = rgba_float[2];
+#                    else:
+#                        if( self.substrates_toggle.value and 1 == 2 ):
+#                            r = background * (1-alpha) + alpha*rgba_float[0];
+#                            g = background * (1-alpha) + alpha*rgba_float[1];
+#                            b = background * (1-alpha) + alpha*rgba_float[2];
                     rgba = [1,1,1,alpha];
                     rgba[0:3] = [ np.round(r), np.round(g), np.round(b) ];  
                     rgba[0:3] = [x / 255. for x in rgba[0:3] ]  
