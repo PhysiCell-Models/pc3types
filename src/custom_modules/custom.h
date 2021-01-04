@@ -98,19 +98,19 @@ class up_down_signal
  public: 
 	double up; 
 	double down; 
+	
     bool no_promoters;
     bool no_inhibitors; 
+	
+	double base_parameter; 
+	double max_parameter; 
 
     up_down_signal(); 
-    void add_effect_old( double factor, char factor_type );
     void add_effect( double factor, char factor_type );
-
     void add_effect( double factor, std::string factor_type );
 
     void display( void );
 
-    double compute_effect_linear( void ); 
-    double compute_effect_exponential( void ); 
     double compute_effect_hill( void ); 
     double compute_effect( void ); 
 

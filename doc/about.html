@@ -123,21 +123,30 @@ We track the balance of inhibition and promotion of each key behavior (a model p
 <li>If a signal <i>s</i> is a promoter, then it is added to <i>U</i>.</li>
 <li>If a signal <i>s</i> is an inhibitor, then it is added to <i>D</i>.</li>
 <li>If a signal <i>s</i> is a neutral, then there is no change to <i>U</i> or <i>D</i>.</li>
-<li>After considering all signals, calculate a multiplier <i>M</i> for the parameter: <br>
+<li>After considering all signals, calculate the parameter value <i>p</i> as follows: <br> 
     <br>    
-    <i>M</i> = [ <i>U</i><sup>n</sup>/(<i>U</i><sup>n</sup> + <i>h</i><sup>n</sup>)  ]  &times; 
-     [ 1-<i>D</i><sup>n</sup>/(<i>D</i><sup>n</sup> + <i>h</i><sup>n</sup>) ]  <br>
-    <br>
-where <i>n</i> is the Hill power (default: <i>n</i>=5) and <i>h</i> is the half-max value (default: <i>h</i>=0.1).
-</p>
-</li>
-<li>Multiply the multiplier <i>M</i> by the corresponding parameters.</li>
-</ul>
-<p>For example, suppose the cell divides at a maximum rate <i>r</i><sub>max</sub>, that signal &alpha; is a promoter, 
-    and signals &beta; and &gamma; are ihibitors. Then (with default parameters): <br>
+    <i>p</i> = [ <i>p</i><sub>0</sub> + ( <i>p</i><sub>max</sub> - <i>p</i><sub>0</sub> ) <i>H</i>(<i>U</i>) ] &times; 
+	[ 1 - <i>H</i>(<i>D</i>) ], <br>
+	<br>
+ where: 
+ <ul>
+  <li><i>p</i><sub>0</sub> is the base parameter value in the absence of promoters and inhibitors </li>
+  <li><i>p</i><sub>max</sub> is the maximum parameter value under maximum promotion </li>
+  <li><i>H</i>(<i>x</i>) is a Hill function: <br>
+  <br>
+  <i>H</i>(<i>x</i>) = <i>x</i>^<i>n</i> / (<i>h</i>^<i>n</i> + <i>x</i>^<i>n</i>) <br>
 <br>
-<i>r</i><sub>division</sub> = <i>r</i><sub>max</sub>[ <i>&alpha;</i><sup>5</sup>/(<i>&alpha;</i><sup>5</sup>+0.1<sup>5</sup>)  ]  &times; 
-     [ 1-(<i>&beta;+&gamma;</i>)<sup>5</sup>/( (<i>&beta;+&gamma;</i>)<sup>5</sup>+0.1<sup>5</sup> ) ] 
+for Hill power <i>n</i> (default: <i>n</i>=5) and half max <i>h</i> (default: <i>h</i>=0.1). 
+</li>
+</ul>
+</ul>
+
+<p>For example, suppose the cell divides at a maximum rate <i>r</i><sub>max</sub> = 0.0072 min<sup>-1</sup> 
+with base rate <i>r</i><sub>0</sub> = 0.00072 min<sup>-1</sup>, that signal &alpha; is a promoter, and 
+signals &beta; and &gamma; are inhibitors. Then (with default parameters): <br>
+<br>
+    <i>r</i> = [ 0.00072 + 0.00648 &times; [ <i>&alpha;</i><sup>5</sup>/(<i>&alpha;</i><sup>5</sup>+0.1<sup>5</sup>)  ] ] &times; 
+	[ 1-(<i>&beta;+&gamma;</i>)<sup>5</sup>/( (<i>&beta;+&gamma;</i>)<sup>5</sup>+0.1<sup>5</sup> ) ] 
 <br>
 </p>
 <p>Notice that any single promoter is sufficient for up-regulation, and adding more 

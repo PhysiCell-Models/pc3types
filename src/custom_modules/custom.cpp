@@ -372,42 +372,14 @@ up_down_signal::up_down_signal()
 {
     up = 0.0;
 	down = 0.0; 
+	
+	base_parameter = 0.0;
+	max_parameter = 1.0; 
+
     no_promoters = true; 
     no_inhibitors = true; 
 	return; 
 } 
-
-void up_down_signal::add_effect_old( double factor, char factor_type )
-{
-	// neutral signal 
-	if( factor_type == 'N' || factor_type == 'n' )
-	{ return; }
-
-	// promoter signal 
-	if( factor_type == 'P' || factor_type == 'p' )
-	{
-		// up = sum of all (scaled) promoter signals 
-		up += factor; 
-		// cap up signal at 1.0 
-		if( up > 1.0 )
-		{ up = 1.0; }
-		no_promoters = false; 
-		return; 
-	}
-
-	// inhibitor signal 
-	if( factor_type == 'I' || factor_type == 'i' )
-	{
-		if( factor > down )
-		{ down = factor; }
-		if( down > 1 )
-		{ down = 1.0; }
-		no_inhibitors = false; 
-		return; 
-	}
-
-	return; 
-}
 
 void up_down_signal::add_effect( double factor, char factor_type )
 {
@@ -441,25 +413,6 @@ void up_down_signal::add_effect( double factor, std::string factor_type )
 	return; 
 }
 
-double up_down_signal::compute_effect_linear( void )
-{
-	double UP = up;
-	if( no_promoters )
-	{ UP = 1.0; }
-	return UP * (1.0 - down ); 
-}
-
-double up_down_signal::compute_effect_exponential( void )
-{
-	double UP = 1.0 - exp( -up );
-	double DOWN = exp( -down );  
-	if( no_promoters )
-	{ UP = 1.0; }
-	if( no_inhibitors )
-	{ DOWN = 1.0; }
-	return UP * DOWN; 
-}
-
 double up_down_signal::compute_effect_hill( void )
 {
 	static double hill_power = parameters.doubles( "hill_power" ); 
@@ -469,14 +422,15 @@ double up_down_signal::compute_effect_hill( void )
 	double temp = pow( up , hill_power ); 
 	double UP = temp / ( denom_constant + temp ); 
 	if( no_promoters )
-	{ UP = 1.0; }
+	{ UP = 0.0; }
 	
 	temp = pow( down , hill_power ); 
 	double DOWN = denom_constant / ( denom_constant + temp ); 
 	if( no_inhibitors )
 	{ DOWN = 1.0; }
 
-	return UP * DOWN; 
+	// return UP * DOWN; 
+	return (base_parameter + (max_parameter-base_parameter)*UP) * DOWN; 
 }
 
 double up_down_signal::compute_effect( void )
@@ -488,6 +442,10 @@ void up_down_signal::reset( void )
 	down = 0.0; 
 	no_promoters = true; 
 	no_inhibitors = true; 
+	
+	base_parameter = 0.0;
+	max_parameter = 1.0; 
+	
 	return; 
 }
 
@@ -508,20 +466,6 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static Cell_Definition* pCD  = find_cell_definition("A");
 	static int nApoptosis = pCD->phenotype.death.find_death_model_index( "Apoptosis"); 
 	static int nNecrosis  = pCD->phenotype.death.find_death_model_index( "Necrosis"); 
-
-/*
-	if( phenotype.death.dead == true )
-	{
-		#pragma omp critical 
-		{
-			std::cout << (long int) pCell << std::endl ; 
-			std::cout << phenotype.cycle.model().name << std::endl; 
-			std::cout << "apop : " << phenotype.death.rates[nApoptosis] << std::endl; 
-			std::cout << "necro: " << phenotype.death.rates[nNecrosis] << std::endl << std::endl; 
-			system("sleep 1");
-		} 
-	}
-*/
 
 	if( phenotype.death.dead == true )
 	{
@@ -558,13 +502,11 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 
 	// cycle rate 
-	static double base_cycle_rate = pCD->phenotype.cycle.data.transition_rate(0,0); 
-	phenotype.cycle.data.transition_rate(0,1) = base_cycle_rate;
-	phenotype.cycle.data.transition_rate(0,1) *= R; 
-	if( p > parameters.doubles( "A_cycle_pressure_threshold") )
-	{ phenotype.cycle.data.transition_rate(0,1) = 0.0; }
+	double param0 = parameters.doubles("A_base_cycle") * R; 
 
 	up_down_signal sig; 
+	sig.base_parameter = param0; 
+	sig.max_parameter = parameters.doubles("A_max_cycle");
 
 	// A 
 	sig.add_effect( A , parameters.strings("A_cycle_A") );
@@ -573,14 +515,17 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// C 
 	sig.add_effect( C , parameters.strings("A_cycle_C") );
 	
-	phenotype.cycle.data.transition_rate(0,1) *= sig.compute_effect(); 
+	phenotype.cycle.data.transition_rate(0,0) = sig.compute_effect(); 
+	if( p > parameters.doubles( "A_cycle_pressure_threshold") )
+	{ phenotype.cycle.data.transition_rate(0,0) = 0.0; }
 
 	// apoptotic rate 
-
-	double base_apoptosis_rate = pCD->phenotype.death.rates[nApoptosis]; 
-	phenotype.death.rates[nApoptosis] = base_apoptosis_rate; 
-
+	
+	static double base_death_rate = parameters.doubles("A_base_death"); 
+	static double max_death_rate = parameters.doubles("A_max_death");
 	sig.reset();
+	sig.base_parameter = base_death_rate;
+	sig.max_parameter = max_death_rate; 
 
 	// A 
 	sig.add_effect( A , parameters.strings("A_death_A") );
@@ -591,16 +536,18 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( C , parameters.strings("A_death_R") );	
 	
-	phenotype.death.rates[nApoptosis] *= sig.compute_effect(); 
+	phenotype.death.rates[nApoptosis] = sig.compute_effect(); 
 	if( p > parameters.doubles("A_apoptosis_pressure_threshold") )
 	{
 		phenotype.death.rates[nApoptosis] = 10; 
 	}
 
 	// speed 
-	phenotype.motility.migration_speed = pCD->phenotype.motility.migration_speed; 
-
+	static double base_speed = parameters.doubles("A_base_speed"); 
+	static double max_speed = parameters.doubles("A_max_speed"); 
 	sig.reset(); 
+	sig.base_parameter = base_speed;
+	sig.max_parameter = max_speed;
 
 	// A 
 	sig.add_effect( A , parameters.strings("A_speed_A") );
@@ -611,14 +558,14 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( C , parameters.strings("A_speed_R") );	
 
-	phenotype.motility.migration_speed *= sig.compute_effect();
+	phenotype.motility.migration_speed = sig.compute_effect();
 
 	// secretion 
-
-	phenotype.secretion.secretion_rates[nA] = 
-		pCD->phenotype.secretion.secretion_rates[nA]; 
-
+	static double base_secretion = parameters.doubles("A_base_secretion");
+	static double max_secretion = parameters.doubles("A_max_secretion"); 
 	sig.reset(); 
+	sig.base_parameter = base_secretion; 
+	sig.max_parameter = max_secretion; 
 	// A 
 	sig.add_effect( A , parameters.strings("A_signal_A") );
 	// B
@@ -628,7 +575,7 @@ void A_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("A_signal_R") );	
 
-	phenotype.secretion.secretion_rates[nA] *= sig.compute_effect();
+	phenotype.secretion.secretion_rates[nA] = sig.compute_effect();
 
 	return; 
 }
@@ -639,20 +586,6 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static Cell_Definition* pCD  = find_cell_definition("B");
 	static int nApoptosis = pCD->phenotype.death.find_death_model_index( "Apoptosis"); 
 	static int nNecrosis  = pCD->phenotype.death.find_death_model_index( "Necrosis"); 
-
-/*
-	if( phenotype.death.dead == true )
-	{
-		#pragma omp critical 
-		{
-			std::cout << (long int) pCell << std::endl ; 
-			std::cout << phenotype.cycle.model().name << std::endl; 
-			std::cout << "apop : " << phenotype.death.rates[nApoptosis] << std::endl; 
-			std::cout << "necro: " << phenotype.death.rates[nNecrosis] << std::endl << std::endl; 
-			system("sleep 1");
-		} 
-	}
-*/
 
 	if( phenotype.death.dead == true )
 	{
@@ -689,13 +622,11 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	}
 
 	// cycle rate 
-	static double base_cycle_rate = pCD->phenotype.cycle.data.transition_rate(0,0); 
-	phenotype.cycle.data.transition_rate(0,1) = base_cycle_rate;
-	phenotype.cycle.data.transition_rate(0,1) *= R; 
-	if( p > parameters.doubles( "B_cycle_pressure_threshold") )
-	{ phenotype.cycle.data.transition_rate(0,1) = 0.0; }
+	double param0 = parameters.doubles("B_base_cycle") * R; 
 
 	up_down_signal sig; 
+	sig.base_parameter = param0; 
+	sig.max_parameter = parameters.doubles("B_max_cycle");
 
 	// A 
 	sig.add_effect( A , parameters.strings("B_cycle_A") );
@@ -704,14 +635,16 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// C 
 	sig.add_effect( C , parameters.strings("B_cycle_C") );
 	
-	phenotype.cycle.data.transition_rate(0,1) *= sig.compute_effect(); 
-
+	phenotype.cycle.data.transition_rate(0,0) = sig.compute_effect(); 
+	if( p > parameters.doubles( "B_cycle_pressure_threshold") )
+	{ phenotype.cycle.data.transition_rate(0,0) = 0.0; }
+	
 	// apoptotic rate 
-
-	double base_apoptosis_rate = pCD->phenotype.death.rates[nApoptosis]; 
-	phenotype.death.rates[nApoptosis] = base_apoptosis_rate; 
-
+	static double base_death_rate = parameters.doubles("B_base_death"); 
+	static double max_death_rate = parameters.doubles("B_max_death");
 	sig.reset();
+	sig.base_parameter = base_death_rate;
+	sig.max_parameter = max_death_rate; 
 
 	// A 
 	sig.add_effect( A , parameters.strings("B_death_A") );
@@ -722,17 +655,18 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( C , parameters.strings("B_death_R") );	
 	
-	phenotype.death.rates[nApoptosis] *= sig.compute_effect(); 
+	phenotype.death.rates[nApoptosis] = sig.compute_effect(); 
 	if( p > parameters.doubles("A_apoptosis_pressure_threshold") )
 	{
 		phenotype.death.rates[nApoptosis] = 10; 
 	}
 
 	// speed 
-	phenotype.motility.migration_speed = pCD->phenotype.motility.migration_speed; 
-
+	static double base_speed = parameters.doubles("B_base_speed"); 
+	static double max_speed = parameters.doubles("B_max_speed"); 
 	sig.reset(); 
-
+	sig.base_parameter = base_speed;
+	sig.max_parameter = max_speed;
 	// A 
 	sig.add_effect( A , parameters.strings("B_speed_A") );
 	// B
@@ -742,14 +676,16 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( C , parameters.strings("B_speed_R") );	
 
-	phenotype.motility.migration_speed *= sig.compute_effect();
+	phenotype.motility.migration_speed = sig.compute_effect();
 
 	// secretion 
 
-	phenotype.secretion.secretion_rates[nB] = 
-		pCD->phenotype.secretion.secretion_rates[nB]; 
-
+	static double base_secretion = parameters.doubles("B_base_secretion");
+	static double max_secretion = parameters.doubles("B_max_secretion"); 
 	sig.reset(); 
+	sig.base_parameter = base_secretion; 
+	sig.max_parameter = max_secretion; 
+	
 	// A 
 	sig.add_effect( A , parameters.strings("B_signal_A") );
 	// B
@@ -759,7 +695,7 @@ void B_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("B_signal_R") );	
 
-	phenotype.secretion.secretion_rates[nB] *= sig.compute_effect();
+	phenotype.secretion.secretion_rates[nB] = sig.compute_effect();
 
 	return; 
 }
@@ -770,20 +706,6 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	static Cell_Definition* pCD  = find_cell_definition("C");
 	static int nApoptosis = pCD->phenotype.death.find_death_model_index( "Apoptosis"); 
 	static int nNecrosis  = pCD->phenotype.death.find_death_model_index( "Necrosis"); 
-
-/*
-	if( phenotype.death.dead == true )
-	{
-		#pragma omp critical 
-		{
-			std::cout << (long int) pCell << std::endl ; 
-			std::cout << phenotype.cycle.model().name << std::endl; 
-			std::cout << "apop : " << phenotype.death.rates[nApoptosis] << std::endl; 
-			std::cout << "necro: " << phenotype.death.rates[nNecrosis] << std::endl << std::endl; 
-			system("sleep 1");
-		} 
-	}
-*/
 
 	if( phenotype.death.dead == true )
 	{
@@ -818,15 +740,13 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 		phenotype.death.rates[nNecrosis] = base_necrosis_rate; 
 		phenotype.death.rates[nNecrosis] *= (1.0 - R / necrosis_threshold);
 	}
-
+ 
 	// cycle rate 
-	static double base_cycle_rate = pCD->phenotype.cycle.data.transition_rate(0,0); 
-	phenotype.cycle.data.transition_rate(0,1) = base_cycle_rate;
-	phenotype.cycle.data.transition_rate(0,1) *= R; 
-	if( p > parameters.doubles( "C_cycle_pressure_threshold") )
-	{ phenotype.cycle.data.transition_rate(0,1) = 0.0; }
+	double param0 = parameters.doubles("C_base_cycle") * R; 
 
 	up_down_signal sig; 
+	sig.base_parameter = param0; 
+	sig.max_parameter = parameters.doubles("C_max_cycle");
 
 	// A 
 	sig.add_effect( A , parameters.strings("C_cycle_A") );
@@ -835,14 +755,17 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// C 
 	sig.add_effect( C , parameters.strings("C_cycle_C") );
 	
-	phenotype.cycle.data.transition_rate(0,1) *= sig.compute_effect(); 
-
+	phenotype.cycle.data.transition_rate(0,0) = sig.compute_effect(); 
+	if( p > parameters.doubles( "C_cycle_pressure_threshold") )
+	{ phenotype.cycle.data.transition_rate(0,0) = 0.0; }
+	
 	// apoptotic rate 
 
-	double base_apoptosis_rate = pCD->phenotype.death.rates[nApoptosis]; 
-	phenotype.death.rates[nApoptosis] = base_apoptosis_rate; 
-
+	static double base_death_rate = parameters.doubles("C_base_death"); 
+	static double max_death_rate = parameters.doubles("C_max_death");
 	sig.reset();
+	sig.base_parameter = base_death_rate;
+	sig.max_parameter = max_death_rate; 
 
 	// A 
 	sig.add_effect( A , parameters.strings("C_death_A") );
@@ -853,16 +776,18 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( C , parameters.strings("C_death_R") );	
 	
-	phenotype.death.rates[nApoptosis] *= sig.compute_effect(); 
+	phenotype.death.rates[nApoptosis] = sig.compute_effect(); 
 	if( p > parameters.doubles("C_apoptosis_pressure_threshold") )
 	{
 		phenotype.death.rates[nApoptosis] = 10; 
 	}
 
 	// speed 
-	phenotype.motility.migration_speed = pCD->phenotype.motility.migration_speed; 
-
+	static double base_speed = parameters.doubles("C_base_speed"); 
+	static double max_speed = parameters.doubles("C_max_speed");
 	sig.reset(); 
+	sig.base_parameter = base_speed;
+	sig.max_parameter = max_speed;
 
 	// A 
 	sig.add_effect( A , parameters.strings("C_speed_A") );
@@ -873,14 +798,16 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( C , parameters.strings("C_speed_R") );	
 
-	phenotype.motility.migration_speed *= sig.compute_effect();
+	phenotype.motility.migration_speed = sig.compute_effect();
 
 	// secretion 
 
-	phenotype.secretion.secretion_rates[nC] = 
-		pCD->phenotype.secretion.secretion_rates[nC]; 
-
+	static double base_secretion = parameters.doubles("C_base_secretion");
+	static double max_secretion = parameters.doubles("C_max_secretion"); 
 	sig.reset(); 
+	sig.base_parameter = base_secretion; 
+	sig.max_parameter = max_secretion; 
+	
 	// A 
 	sig.add_effect( A , parameters.strings("C_signal_A") );
 	// B
@@ -890,7 +817,7 @@ void C_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 	// R 
 	sig.add_effect( R , parameters.strings("C_signal_R") );	
 
-	phenotype.secretion.secretion_rates[nC] *= sig.compute_effect();
+	phenotype.secretion.secretion_rates[nC] = sig.compute_effect();
 
 	return; 
 }
