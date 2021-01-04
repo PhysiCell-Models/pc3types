@@ -569,8 +569,8 @@
 		<A_speed_R type="string" description="impact of resource on A motility (promote, inhibit, or neutral">neutral</A_speed_R>
 
 		<!-- secretion --> 
-		<A_base_secretion type="double" description="base secretion rate of signal A by type A" units="1/min">0</A_base_secretion>
-		<A_max_secretion type="double" description="max secretion rate of signal A by type A" units="1/min">1</A_max_secretion>
+		<A_base_secretion type="double" description="base secretion rate of signal A by type A" units="1/min">1</A_base_secretion>
+		<A_max_secretion type="double" description="max secretion rate of signal A by type A" units="1/min">10</A_max_secretion>
 		<A_signal_A type="string" description="impact of signal A on A secretion (promote, inhibit, or neutral">neutral</A_signal_A>
 		<A_signal_B type="string" description="impact of signal B on A secretion (promote, inhibit, or neutral">neutral</A_signal_B>
 		<A_signal_C type="string" description="impact of signal C on A secretion (promote, inhibit, or neutral">neutral</A_signal_C>
@@ -603,8 +603,8 @@
 		<B_speed_R type="string" description="impact of resource on B motility (promote, inhibit, or neutral">neutral</B_speed_R>
 
 		<!-- secretion --> 
-		<B_base_secretion type="double" description="base secretion rate of signal B by type B" units="1/min">0</B_base_secretion>
-		<B_max_secretion type="double" description="max secretion rate of signal B by type B" units="1/min">1</B_max_secretion>
+		<B_base_secretion type="double" description="base secretion rate of signal B by type B" units="1/min">1</B_base_secretion>
+		<B_max_secretion type="double" description="max secretion rate of signal B by type B" units="1/min">10</B_max_secretion>
 		<B_signal_A type="string" description="impact of signal A on B secretion (promote, inhibit, or neutral">neutral</B_signal_A>
 		<B_signal_B type="string" description="impact of signal B on B secretion (promote, inhibit, or neutral">neutral</B_signal_B>
 		<B_signal_C type="string" description="impact of signal C on B secretion (promote, inhibit, or neutral">neutral</B_signal_C>
@@ -636,8 +636,8 @@
 		<C_speed_R type="string" description="impact of resource on C motility (promote, inhibit, or neutral">neutral</C_speed_R>
 
 		<!-- secretion --> 
-		<C_base_secretion type="double" description="base secretion rate of signal C by type C" units="1/min">0</C_base_secretion>
-		<C_max_secretion type="double" description="max secretion rate of signal C by type C" units="1/min">1</C_max_secretion>
+		<C_base_secretion type="double" description="base secretion rate of signal C by type C" units="1/min">1</C_base_secretion>
+		<C_max_secretion type="double" description="max secretion rate of signal C by type C" units="1/min">10</C_max_secretion>
 		<C_signal_A type="string" description="impact of signal A on C secretion (promote, inhibit, or neutral">neutral</C_signal_A>
 		<C_signal_B type="string" description="impact of signal B on C secretion (promote, inhibit, or neutral">neutral</C_signal_B>
 		<C_signal_C type="string" description="impact of signal C on C secretion (promote, inhibit, or neutral">neutral</C_signal_C>
